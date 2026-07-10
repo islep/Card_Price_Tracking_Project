@@ -1,0 +1,39 @@
+{
+    "@context": "https://schema.org",
+    "@type": "Product",
+    "name": "Sneak Attack",
+    "image": [
+        {
+            "@type": "ImageObject",
+            "contentUrl": "https://tcgplayer-cdn.tcgplayer.com/product/undefined_in_1000x1000.jpg",
+            "creator": "Wizards of the Coast LLC",
+            "thumbnailUrl": "https://tcgplayer-cdn.tcgplayer.com/product/undefined_in_200x200.jpg"
+        }
+    ],
+    "description": "64 listings on TCGplayer for Sneak Attack - Magic: The Gathering - R: You may put a creature card from your hand onto the battlefield. That creature gains haste. Sacrifice the creature at the beginning of the next end step.",
+    "brand": {
+        "@type": "Brand",
+        "name": "Magic: The Gathering"
+    },
+    "sku": "118407",
+    "offers": {
+        "@type": "Offer",
+        "url": "https://www.tcgplayer.com/product/118407/magic-eternal-masters-sneak-attack&country=US",
+        "itemCondition": "https://schema.org/UsedCondition",
+        "availability": "https://schema.org/InStock",
+        "price": "13.99",
+        "priceCurrency": "USD",
+        "shippingDetails": {
+            "@type": "OfferShippingDetails",
+            "shippingRate": {
+                "@type": "MonetaryAmount",
+                "value": "3.99",
+                "currency": "USD"
+            },
+            "shippingDestination": {
+                "@type": "DefinedRegion",
+                "addressCountry": "US"
+            }
+        }
+    }
+}
