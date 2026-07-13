@@ -110,5 +110,5 @@ data = read()
 for card, price, name in data:
     print(f"Card: "+ name + f"")
     evaluate(card, float(price), name)
-    time.sleep(8)
+    time.sleep(5)
 
