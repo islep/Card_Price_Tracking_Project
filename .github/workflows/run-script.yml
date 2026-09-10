@@ -26,5 +26,5 @@ jobs:
 
       - name: Run script
         env:
-          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBOOK }}
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
         run: python main.py

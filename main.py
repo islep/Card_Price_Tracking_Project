@@ -49,7 +49,7 @@ payload = {
     }
 }
 
-WEBHOOK = os.environ["DISCORD_WEBOOK"]
+WEBHOOK = os.environ["DISCORD_WEBHOOK"]
 
 if not WEBHOOK:
     raise ValueError("ERROR: DISCORD_WEBHOOK environment variable is completely empty or missing!")
