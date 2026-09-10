@@ -2,6 +2,7 @@ import csv
 import requests
 import json
 import time
+import os
 
 ## Global Variables
 filename = "Cards.csv"
@@ -48,7 +49,10 @@ payload = {
     }
 }
 
-WEBHOOK = "***REMOVED***"
+WEBHOOK = os.environ.get("DISCORD_WEBHOOK")
+
+if not WEBHOOK:
+    raise ValueError("ERROR: DISCORD_WEBHOOK environment variable is completely empty or missing!")
 
 ## Procedures
 
