@@ -9,6 +9,8 @@ jobs:
   run:
     runs-on: ubuntu-latest
 
+    environment: Environment
+
     steps:
       - uses: actions/checkout@v4
 
@@ -24,5 +26,5 @@ jobs:
 
       - name: Run script
         env:
-          MY_API_KEY: ${{ secrets.DISCORD_WEBHOOK }}
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBOOK }}
         run: python main.py
