@@ -3,6 +3,7 @@ import requests
 import json
 import time
 import os
+import sys
 from dotenv import load_dotenv
 
 # Locally, read DISCORD_WEBHOOK from the .env file (never committed).
@@ -57,25 +58,54 @@ payload = {
 WEBHOOK = os.environ.get("DISCORD_WEBHOOK")
 
 if not WEBHOOK:
-    raise ValueError("ERROR: DISCORD_WEBHOOK environment variable is completely empty or missing!")
+    sys.exit("ERROR: DISCORD_WEBHOOK is missing. Add it to your .env file when running locally, or as a GitHub secret when running on GitHub Actions.")
+
+failures = []
 
 ## Procedures
 
 def read():
     data = []
-    with open(filename, "r", encoding="utf-8") as file:
-        reader = csv.reader(file)
+    try:
+        with open(filename, "r", encoding="utf-8") as file:
+            reader = csv.reader(file)
 
-        for row in reader:
-            data.append(row)
+            for line, row in enumerate(reader, start=1):
+                if not row:
+                    continue
+                if len(row) != 3:
+                    print(f"ERROR: {filename} line {line} should have 3 values (card id, target price, name) but has {len(row)}: {row}")
+                    failures.append(f"{filename} line {line}")
+                    continue
+                card, price, name = row
+                try:
+                    data.append((card, float(price), name))
+                except ValueError:
+                    print(f"ERROR: {filename} line {line} has an invalid target price '{price}' for {name}")
+                    failures.append(f"{filename} line {line}")
+    except FileNotFoundError:
+        sys.exit(f"ERROR: Could not find {filename}. Make sure you are running the program from the project folder.")
 
     return data
 
 
 def evaluate(card, target, name):
     url = apiurl.replace("pid", str(card))
-    response = getJson(url).json()
-    listings = response["results"][0]["results"]
+    try:
+        listings = getJson(url)["results"][0]["results"]
+    except requests.exceptions.Timeout:
+        return "TCGplayer took too long to respond"
+    except requests.exceptions.HTTPError as error:
+        return f"TCGplayer returned HTTP status {error.response.status_code}"
+    except requests.exceptions.JSONDecodeError:
+        return "TCGplayer did not send back valid data"
+    except requests.exceptions.ConnectionError:
+        return "Could not connect to TCGplayer. Check your internet connection"
+    except requests.exceptions.RequestException as error:
+        return f"Request to TCGplayer failed: {error}"
+    except (KeyError, IndexError, TypeError):
+        return "TCGplayer's response was not in the expected format. The card id may be wrong or the site may have changed"
+
     lowest = None
 
     for listing in listings:
@@ -100,22 +130,32 @@ def evaluate(card, target, name):
 
     if lowest is not None:
         message = name + " at $" + str(lowest) + ": " + link.replace("pid", str(card))
-        requests.post(
-            WEBHOOK,
-            json={
-                "content": message
-            }
-        )
+        try:
+            response = requests.post(
+                WEBHOOK,
+                json={
+                    "content": message
+                },
+                timeout=30
+            )
+            response.raise_for_status()
+        except requests.exceptions.HTTPError as error:
+            return f"Discord rejected the alert with HTTP status {error.response.status_code}. Check that DISCORD_WEBHOOK is correct"
+        except requests.exceptions.RequestException:
+            return "Could not send the alert to Discord"
 
+    return None
 
 
 def getJson(url):
     response = requests.post(
         url,
         headers=headers,
-        json=payload
+        json=payload,
+        timeout=30
     )
-    return response
+    response.raise_for_status()
+    return response.json()
 
 ## The program
 
@@ -123,6 +163,12 @@ data = read()
 
 for card, price, name in data:
     print(f"Card: "+ name + f"")
-    evaluate(card, float(price), name)
+    error = evaluate(card, price, name)
+    if error:
+        print(f"ERROR for {name} (card id {card}): {error}")
+        failures.append(name)
     time.sleep(5)
+
+if failures:
+    sys.exit(f"Finished with errors for {len(failures)} item(s): {', '.join(failures)}")
 
