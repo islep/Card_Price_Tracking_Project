@@ -76,6 +76,7 @@ def evaluate(card, target, name):
     url = apiurl.replace("pid", str(card))
     response = getJson(url).json()
     listings = response["results"][0]["results"]
+    lowest = None
 
     for listing in listings:
         seller = listing.get("sellerName", "Unknown")
@@ -92,15 +93,19 @@ def evaluate(card, target, name):
                 f"Shipping: ${shipping:4.2f} | "
                 f"Total: ${total:6.2f}"
             )
-            message = name + " at $" + str(total) + ": " + link.replace("pid", str(card))
-            requests.post(
-                WEBHOOK,
-                json={
-                    "content": message
-                }
-            )
+            if lowest is None or total < lowest:
+                lowest = total
         elif (price + shipping/2 < target):
             print("Almost worthy listing")
+
+    if lowest is not None:
+        message = name + " at $" + str(lowest) + ": " + link.replace("pid", str(card))
+        requests.post(
+            WEBHOOK,
+            json={
+                "content": message
+            }
+        )
 
 
 
