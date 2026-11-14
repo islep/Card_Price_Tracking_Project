@@ -3,6 +3,11 @@ import requests
 import json
 import time
 import os
+from dotenv import load_dotenv
+
+# Locally, read DISCORD_WEBHOOK from the .env file (never committed).
+# On GitHub Actions there is no .env, so the repository secret is used instead.
+load_dotenv()
 
 ## Global Variables
 filename = "Cards.csv"
@@ -49,7 +54,7 @@ payload = {
     }
 }
 
-WEBHOOK = os.environ["DISCORD_WEBHOOK"]
+WEBHOOK = os.environ.get("DISCORD_WEBHOOK")
 
 if not WEBHOOK:
     raise ValueError("ERROR: DISCORD_WEBHOOK environment variable is completely empty or missing!")
