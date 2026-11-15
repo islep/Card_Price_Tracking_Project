@@ -2,7 +2,7 @@ name: Run Python Script
 
 on:
   schedule:
-    - cron: '0 12,14,16,18,20,22 * * *'   # Every 2 hours during the day
+    - cron: '23 12,14,16,18,20,22 * * *'   # Every 2 hours during the day
   workflow_dispatch:         # Allows manual runs
 
 jobs:
