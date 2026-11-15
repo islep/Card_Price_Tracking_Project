@@ -129,7 +129,7 @@ def evaluate(card, target, name):
             print("Almost worthy listing")
 
     if lowest is not None:
-        message = name + " at $" + str(lowest) + ": " + link.replace("pid", str(card))
+        message = name + " at $" + str(round(lowest, 2)) + ": " + link.replace("pid", str(card))
         try:
             response = requests.post(
                 WEBHOOK,
