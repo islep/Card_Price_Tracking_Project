@@ -167,7 +167,7 @@ for card, price, name in data:
     if error:
         print(f"ERROR for {name} (card id {card}): {error}")
         failures.append(name)
-    time.sleep(5)
+    time.sleep(3)
 
 if failures:
     sys.exit(f"Finished with errors for {len(failures)} item(s): {', '.join(failures)}")
